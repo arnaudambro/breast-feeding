@@ -1,13 +1,14 @@
 {
   "name": "breast-feeding",
   "version": "0.1.0",
-  "homepage": "/breast-feeding",
+  "homepage": "https://www.ambroselli.io/breast-feeding",
   "private": true,
   "dependencies": {
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-redux": "^7.1.0",
     "react-scripts": "3.0.1",
+    "react-swipe-to-delete-ios": "^1.0.0",
     "redux": "^4.0.1",
     "redux-persist": "^5.10.0",
     "styled-components": "^4.3.2"

@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components'
-import SwipeToDelete from './SwipeToDelete';
+import SwipeToDelete from 'react-swipe-to-delete-ios';
 import { formatChrono, buttonsHeight, color, bordersColor } from '../helpers';
 import StartAndEndTime from './StartAndEndTime';
 import StopButton from './StopButton';
@@ -12,6 +12,7 @@ const EventStyled = styled.div`
   align-items: center;
   background: white;
   width: 100%;
+  border-bottom: 1px solid ${bordersColor};
   * {
     -webkit-user-select: none; /* Safari */
     -moz-user-select: none; /* Firefox */
@@ -55,7 +56,10 @@ const Breast = styled.span`
 const Event = ({ event, deleteEvent, swipeable, startOnly, stopEvent }) => {
   const Container = swipeable ? SwipeToDelete : React.Fragment;
   const containerProps = swipeable
-  ? { onDelete: () => deleteEvent(event.id) }
+  ? {
+      onDelete: () => deleteEvent(event.id),
+      height: buttonsHeight
+    }
   : {}
 
   let message;
