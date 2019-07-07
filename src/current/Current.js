@@ -1,41 +1,34 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import styled, { css } from 'styled-components'
-import { formatChrono, buttonsHeight, color } from '../helpers';
+import { buttonsHeight, color, initButton, bordersColor } from '../helpers';
 import { updateDuration, startEvent, stopEvent } from './currentDucks';
+import Event from '../event/Event';
+
+const cssOverflow = css`
+  overflow-x: scroll;
+  overflow-y: hidden;
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  &::after {
+    content: "";
+    width: ${buttonsHeight * 0.1}px;
+    border: 1px solid transparent;
+    flex-shrink: 0;
+  }
+`
 
 const CurrentContainer = styled.div`
   height: ${buttonsHeight}px;
   display: flex;
   flex-shrink: 0;
-  justify-content: space-around;
+  justify-content: flex-start;
   align-items: center;
-  font-size: 2em;
-  background-color: ${({ breast }) => color[breast]};
-`
-
-const Breast = styled.span`
-  font-size: 1em;
-  text-transform: uppercase;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-`
-
-export const initButton = css`
   position: relative;
-  border: none;
-  box-shadow: none;
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  flex: 1 1 100%;
-  text-transform: uppercase;
-  font-weight: 600;
-  height: 100%;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
+  background-color: ${({ breast }) => color[breast]};
+  flex-wrap: nowrap;
+  ${props => !props.breast && cssOverflow}
 `
 
 const BreastGaucheButton = styled.button`
@@ -53,24 +46,18 @@ const PumpButton = styled.button`
   background-color: ${color.pump};
 `
 
-const StopButtonStyled = styled.button`
+const PoopButton = styled.button`
   ${initButton}
-  background-color: white;
-  border-radius: 100%;
-  div {
-    background-color: ${({ breast }) => color[breast]};
-    height: ${buttonsHeight / 5}px;
-    width: ${buttonsHeight / 5}px;
-  }
-  height: ${buttonsHeight / 2}px;
-  flex-basis: ${buttonsHeight / 2}px;
-  flex-grow: 0;
+  background-color: ${color['💩']};
+  font-size: 3em;
 `
 
-const StopButton = ({ stopEvent, breast }) =>
-  <StopButtonStyled onClick={stopEvent} breast={breast} >
-    <div />
-  </StopButtonStyled>
+const MedicMamaButton = styled.button`
+  ${initButton}
+  background-color: ${color['💊']};
+  border: 1px solid ${bordersColor};
+  font-size: 3em;
+`
 
 const Button = ({ Component, startEvent, value }) =>
   <Component value={value} onClick={() => startEvent(value)} >
@@ -111,16 +98,12 @@ class Current extends React.Component {
 
   render() {
 
-    const { breast, duration } = this.props;
+    const { breast } = this.props;
 
     return(
       <CurrentContainer breast={breast}>
         {breast
-        ? <>
-            <Breast>{breast}</Breast>
-            <span>{formatChrono(duration)}</span>
-            <StopButton breast={breast} stopEvent={this.handleStopEvent} />
-          </>
+        ? <Event event={this.props} startOnly stopEvent={this.handleStopEvent}/>
         : <>
             <ButtonConnected
               value="left"
@@ -133,6 +116,14 @@ class Current extends React.Component {
             <ButtonConnected
               value="right"
               Component={BreastDroitButton}
+            />
+            <ButtonConnected
+              value="💩"
+              Component={PoopButton}
+            />
+            <ButtonConnected
+              value="💊"
+              Component={MedicMamaButton}
             />
           </>
         }

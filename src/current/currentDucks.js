@@ -1,6 +1,6 @@
 
 // Actions
-const START_EVENT = 'START_EVENT';
+export const START_EVENT = 'START_EVENT';
 export const STOP_EVENT = 'STOP_EVENT';
 const UPDATE_CHRONO = 'UPDATE_CHRONO';
 
@@ -36,16 +36,22 @@ const initalState = {
 const reducer = (state = initalState, action) => {
   switch (action.type) {
     case START_EVENT: {
-      return {
-        ...state,
-        breast: action.payload,
-        start: Date.now()
+      switch (action.payload) {
+        case '💩':
+        case '💊':
+          return state
+        default:
+          return {
+            ...state,
+            breast: action.payload,
+            start: Date.now()
+          }
       }
     }
     case UPDATE_CHRONO: {
       return {
         ...state,
-        duration: state.duration + action.payload,
+        duration: Date.now() - state.start,
       }
     }
     case STOP_EVENT: {
