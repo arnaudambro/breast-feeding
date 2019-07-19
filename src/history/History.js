@@ -64,6 +64,7 @@ class History extends React.Component {
                 key={event.id}
                 event={event}
                 deleteEvent={(id) => deleteEvent(day, id)}
+                editable
               />
             )}
           </Section>

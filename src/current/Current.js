@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import styled, { css } from 'styled-components'
 import { buttonsHeight, color, initButton, bordersColor } from '../helpers';
 import { updateDuration, startEvent, stopEvent } from './currentDucks';
+import gong from '../assets/gong.m4a'
 import Event from '../event/Event';
 
 const cssOverflow = css`
@@ -59,12 +60,18 @@ const MedicMamaButton = styled.button`
   font-size: 3em;
 `
 
+const Sound = styled.audio`
+  height: 0;
+  position: absolute;
+  width: 0;
+  visibility: hidden;
+  pointer-events: none;
+`
+
 const Button = ({ Component, startEvent, value }) =>
   <Component value={value} onClick={() => startEvent(value)} >
     {value}
   </Component>
-
-const ButtonConnected = connect(null, { startEvent })(Button);
 
 class Current extends React.Component {
 
@@ -72,9 +79,19 @@ class Current extends React.Component {
     if (!window.duration) {
       this.updateDuration()
     }
+    this.playGongFirstTime = false;
+    this.playGongSecondTime = false;
   }
   componentDidUpdate() {
     this.updateDuration()
+    if (this.props.duration > 60000 * 20 && this.playGongFirstTime) {
+      this.playGongFirstTime = false;
+      this.gong.play()
+    }
+    if (this.props.duration > 60000 * 25 && this.playGongSecondTime) {
+      this.playGongSecondTime = false;
+      this.gong.play()
+    }
   }
 
   updateDuration = () => {
@@ -85,7 +102,7 @@ class Current extends React.Component {
         updateDuration(timeInterval)
       }, timeInterval)
     }
-    if (!breast && this.duration) {
+    if (!breast && window.duration) {
       window.clearTimeout(window.duration)
     }
   }
@@ -94,6 +111,16 @@ class Current extends React.Component {
     const { breast, duration, stopEvent, start } = this.props;
     stopEvent({ breast, duration, start })
     window.clearTimeout(window.duration)
+    this.gong.pause()
+    this.gong.currentTime = 0
+
+  }
+
+  handleStartEvent = value => {
+    this.gong.play();
+    this.gong.pause();
+    this.gong.currentTime = 0;
+    this.props.startEvent(value)
   }
 
   render() {
@@ -101,36 +128,44 @@ class Current extends React.Component {
     const { breast } = this.props;
 
     return(
-      <CurrentContainer breast={breast}>
-        {breast
-        ? <Event event={this.props} startOnly stopEvent={this.handleStopEvent}/>
-        : <>
-            <ButtonConnected
-              value="left"
-              Component={BreastGaucheButton}
-            />
-            <ButtonConnected
-              value="pump"
-              Component={PumpButton}
-            />
-            <ButtonConnected
-              value="right"
-              Component={BreastDroitButton}
-            />
-            <ButtonConnected
-              value="💩"
-              Component={PoopButton}
-            />
-            <ButtonConnected
-              value="💊"
-              Component={MedicMamaButton}
-            />
-          </>
-        }
-      </CurrentContainer>
+      <>
+        <Sound src={gong} ref={g => this.gong = g} />
+        <CurrentContainer breast={breast}>
+          {breast
+          ? <Event event={this.props} startOnly stopEvent={this.handleStopEvent}/>
+          : <>
+              <Button
+                value="left"
+                Component={BreastGaucheButton}
+                startEvent={this.handleStartEvent}
+              />
+              <Button
+                value="pump"
+                Component={PumpButton}
+                startEvent={this.handleStartEvent}
+              />
+              <Button
+                value="right"
+                Component={BreastDroitButton}
+                startEvent={this.handleStartEvent}
+              />
+              <Button
+                value="💩"
+                Component={PoopButton}
+                startEvent={this.handleStartEvent}
+              />
+              <Button
+                value="💊"
+                Component={MedicMamaButton}
+                startEvent={this.handleStartEvent}
+              />
+            </>
+          }
+        </CurrentContainer>
+      </>
 
      )
   }
 }
 
-export default connect(() => state => state.current, { updateDuration, stopEvent })(Current);
+export default connect(() => state => state.current, { updateDuration, stopEvent, startEvent })(Current);
